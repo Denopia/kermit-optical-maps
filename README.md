@@ -20,7 +20,7 @@ This is an extension to the guided genome assembler Kermit https://github.com/ri
 5. Kermit https://github.com/rikuu/kermit
 (Plus other requirements for these programs to work)
 6. Python 3
-7. Python libraries: ???, ???, ...
+7. Python libraries: Biopython https://biopython.org/
 
 ### Installation
 Through this guide we assume the home directory is ??? and everything is installed there
