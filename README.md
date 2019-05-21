@@ -32,16 +32,18 @@ How to install (external apps)
 This extension contains two main programs, optical map generator (???.py) and read colorer (???.py).
 
 Optical map generator is used with 
+```
 python ???.py a b c d
-
+```
 a explanation
 b explanation
 c explanation
 d explanation
 
 Read colorer is used with 
+```
 python ???.py a b c d
-
+```
 a explanation
 b explanation
 c explanation
