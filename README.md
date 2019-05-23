@@ -5,11 +5,11 @@ This is an extension to the guided genome assembler Kermit https://github.com/ri
 ### Here are the steps needed to color reads with optical maps:
 1. Correct reads (we used correction tool CONSENT https://github.com/morispi/CONSENT)
 2. The corrected reads are used to assemble pre-coloring contigs with miniasm https://github.com/lh3/miniasm
-3.1. Optical maps of the pre-coloring contigs are generated using ???.py (imitating restriction enzyme used for reference optical map, 'XhoI' as default)
-3.2. Optical map for the reference is generated like in step 3.1. if it is not available but the genome itself is i.e. in test cases
-4. Pre-coloring contig optical maps are mapped to the reference optical map using Valouev mapping tool https://github.com/mmuggli/valouev_optmap_alignment
-5. Corrected reads are colored using ???.py
-6. Post-coloring contigs are assembled with Kermit using the colored reads
+3. Optical maps of the pre-coloring contigs are generated using ???.py (imitating restriction enzyme used for reference optical map, 'XhoI' as default)
+4. Optical map for the reference is generated like in step 3 if it is not available but the genome itself is i.e. in test cases
+5. Pre-coloring contig optical maps are mapped to the reference optical map using Valouev mapping tool https://github.com/mmuggli/valouev_optmap_alignment
+6. Corrected reads are colored using ???.py
+7. Post-coloring contigs are assembled with Kermit using the colored reads
 
 
 ### External programs needed:
