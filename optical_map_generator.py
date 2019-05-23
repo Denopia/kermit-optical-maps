@@ -1,6 +1,8 @@
 import argparse
-from file_opener_f import open_fasta
-from sequence_cutter_f import fragmentize_sequence
+#from pathlib import Path
+#import os
+from file_opener import open_fasta
+from sequence_cutter import fragmentize_sequence
 
 # Parse arguments
 parser = argparse.ArgumentParser()
@@ -8,7 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(dest='fasta_path', action='store',
                     help='Path to sequences')
 
-parser.add_argument(dest='optmap_path', action='store',
+parser.add_argument('-o', '--optical_map_path', dest='optmap_path', action='store', default="use_default",
                     help='Path where to save optical maps')
 
 parser.add_argument('-z', '--enzyme', action='store', dest='enzyme', default='XhoI',
@@ -33,16 +35,30 @@ enzyme = results.enzyme
 minimum_fragment_length = results.min_fragment
 skip_first = results.skip_first
 skip_last = results.skip_last
+if optical_map_path == "use_default":
+    optical_map_path = sequences_fasta_path + ".valouev"
 
 
 # Open sequences
+print("== Reading sequences ==")
 sequences = open_fasta(sequences_fasta_path)
+print("-- Done --")
 
-# Write fragments in a file
+# Fragmentize sequences
+print("== Fragmentizing sequences ==")
+sequences_fragments = {}
+for sequence in sequences:
+    seq_name = sequence.id
+    seq_fragments = fragmentize_sequence(sequence.seq, enzyme)
+    sequences_fragments[seq_name] = seq_fragments
+print("-- Done --")
+
+
+# Write optical maps file
+print("== Writing optical maps ==")
 with open(optical_map_path, "w") as wfile:
-    for sequence in sequences:
-        sequence_name = sequence.id
-        sequence_fragments = fragmentize_sequence(sequence.seq, enzyme)
+    for sequence_name in sorted(sequences_fragments.keys(), key=lambda item: (len(item), item)):
+        sequence_fragments = sequences_fragments[sequence_name]
 
         start_fragment = 0
         if skip_first:
@@ -59,3 +75,4 @@ with open(optical_map_path, "w") as wfile:
                 wfile.write("\t" + str(current_fragment / 1000))
 
         wfile.write("\n\n")
+print("-- Done --")
