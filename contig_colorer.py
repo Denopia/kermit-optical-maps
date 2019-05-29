@@ -2,7 +2,17 @@ import argparse
 import os
 from file_opener import open_valouev
 
+'''
+Colors contigs according to the output
+of optical map mappin tool by Valouev et al.
 
+This step could be merged with read coloring
+so no "unnecessary" contig coloring file is 
+generated.
+'''
+
+
+# Function to parse arguments given to this program
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument(dest='optical_mapping_output', action='store',
@@ -29,10 +39,11 @@ def extract_names(op_line):
     return contig_name, reference_name
 
 
-# Function to extract contig fragment colors from an output line
-def extract_colors(op_line, firstie, lastie):
-    contig_side = op_line.split("]->")[0][1:].strip()
-    reference_side = op_line.split("->[")[-1].replace("]", "").strip()
+# Function to extract contig fragment colors from an output line.
+# Also returns updated values for the first and last mapping fragments.
+def extract_colors(output_line, firstie, lastie):
+    contig_side = output_line.split("]->")[0][1:].strip()
+    reference_side = output_line.split("->[")[-1].replace("]", "").strip()
     contig_side_frags = contig_side.split(", ")
     reference_side_frags = reference_side.split(", ")
 
@@ -64,18 +75,16 @@ def extract_colors(op_line, firstie, lastie):
 def finalize_coloring(contig_name, reference_name, new_contig, new_colors, full_contigs,
                       forward, firstie, lastie, reference_chromosome_nums, chromosome_shift):
     if forward:
-        missing_from_start = 1 + firstie
-        missing_from_end = len(full_contigs[contig_name]) - 1 - (lastie + 1)
-
+        missing_from_start = firstie
+        missing_from_end = len(full_contigs[contig_name]) - lastie - 1
         finalized_contigs = full_contigs[contig_name][:missing_from_start] + [x for x in new_contig]
         finalized_contigs = finalized_contigs + full_contigs[contig_name][len(full_contigs[contig_name])-missing_from_end:]
-
         finalized_colors = missing_from_start * [new_colors[0] - 1] + [x for x in new_colors]
         finalized_colors = finalized_colors + missing_from_end * [new_colors[-1] + 1]
 
     if not forward:
-        missing_from_end = 1 + firstie
-        missing_from_start = len(full_contigs[contig_name]) - 1 - (lastie + 1)
+        missing_from_end = firstie
+        missing_from_start = len(full_contigs[contig_name]) - lastie - 1
         finalized_contigs = [x for x in new_contig]
         finalized_contigs.reverse()
         finalized_colors = [x for x in new_colors]
@@ -105,7 +114,6 @@ def main(args):
     full_contigs = open_valouev(contig_opt_map_full, as_dict=True)
     full_reference = open_valouev(reference_opt_map_full, as_dict=True)
 
-
     # Read optical mapping output
     with open(contig_reference_mapping, "r") as rfile:
         mapping_lines = rfile.readlines()
@@ -118,8 +126,12 @@ def main(args):
         colored_contigs_path = "./data/colored_contigs.ccf"
 
     # Find the right amount of padding between chromosomes
+
+    # Dictionary: chromosome -> its number
     reference_chromosome_nums = {}
+    # Start numbering chromosomes from 1
     rci = 1
+    # Maximum number of fragments in any chromosome optical map
     max_fragments = 0
     for key in full_reference.keys():
         reference_chromosome_nums[key] = rci
@@ -127,16 +139,20 @@ def main(args):
             max_fragments = len(full_reference[key])
         rci += 1
 
+    # Padding is the second smallest power of ten that is greater than the maximum number of chromosome fragments
     chromosome_shift = int("1" + (len(str(max_fragments)) + 1) * "0")
 
-    # Store coloring information in these
+    # Store contig coloring information in these
     new_contig_names = []
     new_contig_fragments = []
     new_contig_fragments_colors = []
 
+    # Mapping is forward/reverse
     forward = True
-    firstie = 999999
+    # The first and last fragments of the mapping
+    firstie = max_fragments
     lastie = 0
+    # Coloring information of the current contig
     new_contig = []
     new_colors = []
     contig_name = "Name:NULL"
@@ -159,9 +175,9 @@ def main(args):
             contig_name, reference_name = extract_names(line)
         # Line contains fragment mapping information
         if line.startswith("["):
-            add_new_contig, add_new_colors, firstie, lastie = extract_colors(line, firstie, lastie)
-            new_contig += add_new_contig
-            new_colors += add_new_colors
+            additional_fragments, additional_fragment_colors, firstie, lastie = extract_colors(line, firstie, lastie)
+            new_contig += additional_fragments
+            new_colors += additional_fragment_colors
         # Line contains mapping's s-score
         if line.startswith("s-score"):
             s_score = float(line.split(":")[-1])
@@ -170,13 +186,15 @@ def main(args):
             t_score = float(line.split(":")[-1])
             # If the mapping scores are good enough contig coloring is finalized and saved
             if t_score >= t_score_limit and s_score >= s_score_limit:
-                final_fragments, final_colors = finalize_coloring(contig_name, reference_name, new_contig, new_colors, full_contigs,
-                                                                  forward, firstie, lastie, reference_chromosome_nums, chromosome_shift)
+                final_fragments, final_colors = finalize_coloring(contig_name, reference_name, new_contig, new_colors,
+                                                                  full_contigs, forward, firstie, lastie,
+                                                                  reference_chromosome_nums, chromosome_shift)
                 new_contig_names.append(contig_name)
                 new_contig_fragments.append(final_fragments)
                 new_contig_fragments_colors.append(final_colors)
+            # Reset variables
             forward = True
-            firstie = 999999
+            firstie = max_fragments
             lastie = 0
             new_contig = []
             new_colors = []
@@ -197,9 +215,8 @@ def main(args):
             for frag in fragments:
                 wfile.write(str(round(frag, 3)) + "\t")
             wfile.write("\n")
-            # ADD 1 TO SHIFT COLORS BECAUSE THEY START FROM 0 IN THE TRIMMED VERSION OF REFERENCE
             for color in colors:
-                wfile.write(str(color+1) + "\t")
+                wfile.write(str(color) + "\t")
             wfile.write("\n\n")
     print("-- Done --")
 

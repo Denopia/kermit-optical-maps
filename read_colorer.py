@@ -1,7 +1,15 @@
 import argparse
 import os
 
+'''
+Colors reads according to reads to contigs
+alignments and contig colors.
 
+Could probably be merged with contig coloring.
+'''
+
+
+# Function to parse arguments given to this program
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument(dest='read_contig_mapping', action='store',
@@ -15,7 +23,7 @@ def parse_arguments():
     parser.add_argument('-s', '--strict', action='store_true', dest='strict_coloring', default=False,
                         help='Color based on only the best alignment')
     parser.add_argument('-l', '--alignment_limit', action='store', dest='alignment_limit', default='0.0', type=float,
-                        help='Minimum s-score')
+                        help='Alignment limit multiplier')
     results = parser.parse_args()
     return results
 
@@ -40,8 +48,8 @@ def main(args):
     with open(read_contig_mapping, "r") as rfile:
         mapping_lines = rfile.readlines()
 
+    # Dictionary: Contig -> [[Fragment lengths], [Fragment colors]]
     contig_fragments_colors = {}
-
     i = 0
     while i < len(contig_color_lines):
         contig_name = contig_color_lines[i].strip()
@@ -54,11 +62,10 @@ def main(args):
         contig_fragments_colors[contig_name].append([float(x) for x in fragments])
         contig_fragments_colors[contig_name].append([int(x) for x in colors])
 
+    # Dictionary: Read -> Its chosen alignment to a contig
     read_to_contig = {}
-    qq = 0
-    last_read_name = "Read:NULL"
+    last_read_name = "Name:NULL"
     for line in mapping_lines:
-        qq += 1
         mapping = line.split("\t")
         '''
         print("Read name:", mapping[0],  "Read length: ", mapping[1], "Read start:", mapping[2],
@@ -78,6 +85,7 @@ def main(args):
 
     reads_and_colors = []
 
+    # Color reads
     for read_name in sorted(read_to_contig.keys(), key=lambda item: (len(item), item)):
         mapping = read_to_contig[read_name]
         read_name = mapping[0]
@@ -93,7 +101,7 @@ def main(args):
         contig_fragments = contig_fragments_colors[contig_name][0]
         contig_colors = contig_fragments_colors[contig_name][1]
 
-        if extend_colorings == "0":
+        if not extend_colorings:
             start = contig_start
             end = contig_end
         else:
@@ -102,20 +110,27 @@ def main(args):
 
         current_length = 0
         current_fragment = 0
-        start_color = 999999999
+        start_color = -1
         end_color = -1
 
         while current_fragment < len(contig_fragments):
             current_length += 1000 * contig_fragments[current_fragment]
-            if current_length > start and start_color == 999999999:
+            if current_length > start and start_color == -1:
                 start_color = contig_colors[current_fragment]
             if current_length > end and end_color == -1:
                 end_color = contig_colors[current_fragment]
             current_fragment += 1
 
+        # If the end color stays at -1 in some extreme cases set it to the last color of the contig
         if end_color == -1:
             end_color = contig_colors[-1]
 
+        # If start color stays at -1 there is most likely some error and the coloring should not be saved
+        if start_color == -1:
+            continue
+
+        # If the start and end color order is inverted flip it
+        # (Due to reverse mapping in contig coloring)
         if start_color > end_color:
             temp_start = start_color
             start_color = end_color
