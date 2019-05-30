@@ -41,26 +41,52 @@ python3 optical_map_generator.py [sequenses_path.fasta] [optional arguments]
 ```
 Required arguments:
 ```
-sequences_path.fasta : Path to the sequences you want to generate optical map for.
+sequences_path.fasta : Path to the sequences you want to generate optical map for, in fasta format.
 ```
 Optional arguments:
 ```
--o optical_map_path.valouev : Path to where optical map file is saved, by default 'sequences_path.fasta.valouev'
+-o optical_map_path.valouev : Path to where optical map file is saved to, by default 'sequences_path.fasta.valouev'
 -z enzyme : Name of the enzyme to be emulated, by default 'XhoI'. Multiple enzymes separated with '_' e.g. 'XhoI_NheI'
 -f min_fragment_size : Minimum fragment size, by default 50
 -b : Skips first fragment, included by default
 -e : Skips last fragment, included by default
 ```
 
+Contig colorer is used with 
+```
+python3 contig_colorer.py [optical_mapping_output.txt, reference_map_path.valouev, contigs_maps_path.valouev]
+                          [optional arguments] 
+```
+Required arguments:
+```
+optical_mapping_output.txt : Path to the output of optical map mapping tool by Valouev et al.
+reference_map_path.valouev : Path to the reference genome optical map, in .valouev format
+contigs_maps_path.valouev : Path to the pre-coloring contigs optical maps, in .valouev format
+```
+Optional arguments:
+```
+-c colored_contigs_path.cval : Path to where colored contigs file is saved to, by default './data/colored_contigs.cval'
+-t t_limit : t-score threshold that must be exceeded for the contig to be colored, by default 0
+-s s_limit : s-score threshold that must be exceeded for the contig to be colored, by default 0
+```
+
 Read colorer is used with 
 ```
-python ???.py a b c d
+python3 contig_colorer.py [optical_mapping_output.txt, reference_map_path.valouev, contigs_maps_path.valouev]
+                          [optional arguments] 
 ```
-a explanation
-b explanation
-c explanation
-d explanation
-
+Required arguments:
+```
+optical_mapping_output.txt : Path to the output of optical map mapping tool by Valouev et al.
+reference_map_path.valouev : Path to the reference genome optical map, in .valouev format
+contigs_maps_path.valouev : Path to the pre-coloring contigs optical maps, in .valouev format
+```
+Optional arguments:
+```
+-c colored_contigs_path.cval : Path to where colored contigs file is saved to, by default './data/colored_contigs.cval'
+-t t_limit : t-score threshold that must be exceeded for the contig to be colored, by default 0
+-s s_limit : s-score threshold that must be exceeded for the contig to be colored, by default 0
+```
 ### Example run
 
 
