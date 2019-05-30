@@ -28,9 +28,7 @@ Alternatively you could try skipping correcting reads and polish the post-colori
 3. Anything needed for the external programs to work
 
 ## Installation
-Through this guide we assume the home directory is ??? and everything is installed there
-Where to install,
-How to install (external apps)
+Installation guide might appear later. This extension has only executable python files, so you basically just need to install the external programs, python3 and Biopython according to their respective guides.
 
 
 ## Usage
