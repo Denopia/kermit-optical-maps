@@ -2,7 +2,7 @@
 
 This is an extension to the guided genome assembler Kermit https://github.com/rikuu/kermit. Kermit uses a reference genome or lonkage maps to color reads before assembling the genome. This extension uses optical maps to color reads, which can then be given to Kermit as input.
 
-### Assembly steps
+## Assembly steps
 1. Reads are corrected (e.g. using correction tool CONSENT https://github.com/morispi/CONSENT)
 2. The corrected reads are used to assemble pre-coloring contigs with miniasm https://github.com/lh3/miniasm
 3. Optical maps of the pre-coloring contigs are generated using optical_map_generator.py (imitating restriction enzyme used for reference optical map, 'XhoI' as default)
@@ -14,7 +14,7 @@ This is an extension to the guided genome assembler Kermit https://github.com/ri
 
 Alternatively you could try skipping correcting reads and polish the post-coloring reads at the end.
 
-### External programs needed
+## External programs needed
 1. Long read correction tool, for example CONSENT https://github.com/morispi/CONSENT
 2. Minimap https://github.com/lh3/minimap2
 3. Miniasm https://github.com/lh3/miniasm
@@ -26,16 +26,16 @@ Alternatively you could try skipping correcting reads and polish the post-colori
 2. Python libraries: Biopython https://biopython.org/
 3. Anything needed for the external programs to work
 
-### Installation
+## Installation
 Through this guide we assume the home directory is ??? and everything is installed there
 Where to install,
 How to install (external apps)
 
 
-### Usage
+## Usage
 This extension contains three main programs, optical map generator (optical_map_generator.py), contig colorer (contig_colorer.py) and read colorer (read_colorer.py).
 
-Optical map generator is used with 
+### Optical map generator 
 ```
 python3 optical_map_generator.py [sequenses_path.fasta] [optional arguments] 
 ```
@@ -52,7 +52,7 @@ Optional arguments:
 -e : Skips last fragment, included by default
 ```
 
-Contig colorer is used with 
+### Contig colorer
 ```
 python3 contig_colorer.py [optical_mapping_output.txt, reference_map_path.valouev, contigs_maps_path.valouev]
                           [optional arguments] 
@@ -70,22 +70,22 @@ Optional arguments:
 -s s_limit : s-score threshold that must be exceeded for the contig to be colored, by default 0
 ```
 
-Read colorer is used with 
+### Read colorer
 ```
-python3 contig_colorer.py [optical_mapping_output.txt, reference_map_path.valouev, contigs_maps_path.valouev]
-                          [optional arguments] 
+python3 read_colorer.py [alignments_path.txt, colored_contigs_path.cval]
+                        [optional arguments] 
 ```
 Required arguments:
 ```
-optical_mapping_output.txt : Path to the output of optical map mapping tool by Valouev et al.
-reference_map_path.valouev : Path to the reference genome optical map, in .valouev format
-contigs_maps_path.valouev : Path to the pre-coloring contigs optical maps, in .valouev format
+alignments_path.txt : Path to the reads-to-contigs alignment output of minimap2
+colored_contigs_path.cval : Path to the colored contigs file, in .cval format
 ```
 Optional arguments:
 ```
--c colored_contigs_path.cval : Path to where colored contigs file is saved to, by default './data/colored_contigs.cval'
--t t_limit : t-score threshold that must be exceeded for the contig to be colored, by default 0
--s s_limit : s-score threshold that must be exceeded for the contig to be colored, by default 0
+-r colored_contigs_path.cval : Path to where colored reads file is saved to, by default './data/colored_reads.cf'
+-e : extends read coloring, does not do this by default
+-s : uses strict coloring i.e. coloring is done only based on the best aligning contig
+-l len_multiplier : length of the aligning section must be at least len_multiplier * read_length for the read to be colored, by default 0.0
 ```
 ### Example run
 
