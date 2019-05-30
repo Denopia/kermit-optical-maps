@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Target genome
-TARGET="ecoli"
-#TARGET="scerevisiae"
+#TARGET="ecoli"
+TARGET="scerevisiae"
 #TARGET="celegans"
 #TARGET="arabidopsis"
 
@@ -49,8 +49,6 @@ POSTCOLOR_CONTIGS_NP="data/"$TARGET"-postcolor-contigs-np.fasta"
 ###
 
 minimap2/minimap2 -x ava-pb -t8 $COR_READS $COR_READS | gzip -1 > $READ_READ_ALIGN_ZIP
-#miniasm/minimap2/minimap2 -x ava-pb -t8 $ERR_READS_CORRECTED_REORDERED $ERR_READS_CORRECTED_REORDERED > $READ_READ_PAFZIP
-
 
 ###
 ### 3. Run miniasm to get contigs 
@@ -64,63 +62,61 @@ awk '$1 ~/S/ {print ">"$2"\n"$3}' $MINIASM_GFA | fold > $PRECOLOR_CONTIGS
 ### 4. Create optical maps of contigs
 ###
 
-#python3 optical_map_generator.py $PRECOLOR_CONTIGS -o $PRECOLOR_CONTIGS_OPT_MAP
+python3 optical_map_generator.py $PRECOLOR_CONTIGS -o $PRECOLOR_CONTIGS_OPT_MAP
 
 
 ### 
 ### 5. Create optical map of reference
 ###
 
-#python3 optical_map_generator.py $REFERENCE -o $REFERENCE_OPT_MAP
+python3 optical_map_generator.py $REFERENCE -o $REFERENCE_OPT_MAP
 
 
 ###
 ### 6. Run valouev to map contigs to reference 
 ###
 
-#valouev_optmap_alignment/fit/fit $REFERENCE_OPT_MAP $PRECOLOR_CONTIGS_OPT_MAP | tee $CONTIG_REFERENCE_MAPPING
+valouev_optmap_alignment/fit/fit $REFERENCE_OPT_MAP $PRECOLOR_CONTIGS_OPT_MAP | tee $CONTIG_REFERENCE_MAPPING
 
 
 ###
 ### 7. Run minimap with corrected reads and contigs 
 ###
 
-#minimap2/minimap2 -t8 -x ava-pb $PRECOLOR_CONTIGS $COR_READS > $READ_CONTIG_ALIGN
+minimap2/minimap2 -t8 -x ava-pb $PRECOLOR_CONTIGS $COR_READS > $CONTIGS_READS_ALIGN
 
 
 ###
 ### 8.1 Color contigs
 ###
 
-#python3 contig_colorer.py $CONTIG_REFERENCE_MAPPING $REFERENCE_OPT_MAP $PRECOLOR_CONTIGS_OPT_MAP -c $COLORED_CONTIGS
+python3 contig_colorer.py $CONTIG_REFERENCE_MAPPING $REFERENCE_OPT_MAP $PRECOLOR_CONTIGS_OPT_MAP -c $COLORED_CONTIGS
 
 ###
 ### 8.2 Color reads based on contig colors and alignments
 ###
 
-#python3 read_colorer.py $READ_CONTIG_ALIGN $COLORED_CONTIGS -r $COLORED_READS -e -s 
+python3 read_colorer.py $CONTIGS_READS_ALIGN $COLORED_CONTIGS -r $COLORED_READS -e -s 
 
 ###
 ### 9. Adjust colorings
 ###
 
-#python3 read_recolorer.py $COLORED_READS $ADJ_COLORED_READS
+python3 read_recolorer.py $COLORED_READS -a $ADJ_COLORED_READS
 
 ###
 ### 10. Run kermit
 ###
 
-#miniasm/minimap2/minimap2 -t8 -x ava-pb $ERR_READS_CORRECTED_REORDERED $ERR_READS_CORRECTED_REORDERED > $READ_READ_PAF
+kermit/kermit -C $ADJ_COLORED_READS -f $COR_READS $READ_READ_ALIGN_ZIP > $KERMIT_GFA
+kermit/kermit -C $ADJ_COLORED_READS -f $COR_READS $READ_READ_ALIGN_ZIP -P > $KERMIT_GFA_NP
 
+awk '$1 ~/S/ {print ">"$2"\n"$3}' $KERMIT_GFA > $POSTCOLOR_CONTIGS
+awk '$1 ~/S/ {print ">"$2"\n"$3}' $KERMIT_GFA_NP > $POSTCOLOR_CONTIGS_NP
 
-#kermit/kermit -C $ADJ_COLORED_READS -f $COR_READS $READ_READ_ALIGN_ZIP > $KERMIT_GFA
-#kermit/kermit -C $ADJ_COLORED_READS -f $COR_READS $READ_READ_ALIGN_ZIP -P > $KERMIT_GFA_NP
-
-#awk '$1 ~/S/ {print ">"$2"\n"$3}' $KERMIT_GFA > $POSTCOLOR_CONTIGS
-#awk '$1 ~/S/ {print ">"$2"\n"$3}' $KERMIT_GFA_NP > $POSTCOLOR_CONTIGS_NP
-
-#python3 quast/quast-5.0.2/quast.py -r $REFERENCE $POSTCOLOR_CONTIGS
-#python3 quast/quast-5.0.2/quast.py -r $REFERENCE $POSTCOLOR_CONTIGS_NP
+python3 quast/quast-5.0.2/quast.py -r $REFERENCE $PRECOLOR_CONTIGS
+python3 quast/quast-5.0.2/quast.py -r $REFERENCE $POSTCOLOR_CONTIGS
+python3 quast/quast-5.0.2/quast.py -r $REFERENCE $POSTCOLOR_CONTIGS_NP
 
 
 

@@ -30,6 +30,7 @@ def parse_arguments():
 
 def main(args):
 
+    print("== Initializing ==")
     read_contig_mapping = args.read_contig_mapping
     contig_colors = args.contig_colors
     read_colors_path = args.read_colors
@@ -42,11 +43,15 @@ def main(args):
             os.makedirs("./data")
         read_colors_path = "./data/colored_reads.cf"
 
+    print("-- Done --")
+
+    print("== Reading input files ==")
     with open(contig_colors, "r") as rfile:
         contig_color_lines = rfile.readlines()
 
     with open(read_contig_mapping, "r") as rfile:
         mapping_lines = rfile.readlines()
+
 
     # Dictionary: Contig -> [[Fragment lengths], [Fragment colors]]
     contig_fragments_colors = {}
@@ -61,7 +66,9 @@ def main(args):
         i += 2
         contig_fragments_colors[contig_name].append([float(x) for x in fragments])
         contig_fragments_colors[contig_name].append([int(x) for x in colors])
+    print("-- Done --")
 
+    print("== Coloring contigs ==")
     # Dictionary: Read -> Its chosen alignment to a contig
     read_to_contig = {}
     last_read_name = "Name:NULL"
@@ -137,10 +144,13 @@ def main(args):
             end_color = temp_start
 
         reads_and_colors.append([read_name, start_color, end_color])
+    print("-- Done --")
 
+    print("== Writing contig colors in a file ==")
     with open(read_colors_path, "w") as wfile:
         for coloring in reads_and_colors:
             wfile.write(coloring[0] + "\t" + str(coloring[1]) + "\t" + str(coloring[2]) + "\n")
+    print("-- Done --")
 
 
 if __name__ == "__main__":

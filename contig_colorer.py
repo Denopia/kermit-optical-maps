@@ -110,7 +110,7 @@ def main(args):
     contig_opt_map_full = args.contig_opt_map_path
     t_score_limit = args.t_limit
     s_score_limit = args.s_limit
-    colored_contigs_path = args.contig_colors_path
+    colored_contigs_path = args.contig_coloring_path
 
     print("== Reading input files ==")
     # Read optical maps

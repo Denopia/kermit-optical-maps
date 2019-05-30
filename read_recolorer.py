@@ -57,7 +57,7 @@ def main(args):
         colors[key].sort()
         print("-- Done --")
 
-    print("== Writing adjusted coloring ==")
+    print("== Writing adjusted colorings ==")
     with open(new_coloring_path, 'w') as wfile:
         for cr in colorings:
             chromos = str(cr[1])[:-big_shift]
