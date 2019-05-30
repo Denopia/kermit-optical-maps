@@ -79,8 +79,10 @@ def finalize_coloring(contig_name, reference_name, new_contig, new_colors, full_
         missing_from_end = len(full_contigs[contig_name]) - lastie - 1
         finalized_contigs = full_contigs[contig_name][:missing_from_start] + [x for x in new_contig]
         finalized_contigs = finalized_contigs + full_contigs[contig_name][len(full_contigs[contig_name])-missing_from_end:]
-        finalized_colors = missing_from_start * [new_colors[0] - 1] + [x for x in new_colors]
-        finalized_colors = finalized_colors + missing_from_end * [new_colors[-1] + 1]
+        #finalized_colors = missing_from_start * [new_colors[0] - 1] + [x for x in new_colors]
+        finalized_colors = missing_from_start * [new_colors[0]] + [x for x in new_colors]
+        #finalized_colors = finalized_colors + missing_from_end * [new_colors[-1] + 1]
+        finalized_colors = finalized_colors + missing_from_end * [new_colors[-1]]
 
     if not forward:
         missing_from_end = firstie
@@ -90,9 +92,10 @@ def finalize_coloring(contig_name, reference_name, new_contig, new_colors, full_
         finalized_colors = [x for x in new_colors]
         finalized_colors.reverse()
         finalized_contigs = full_contigs[contig_name][:missing_from_start] + finalized_contigs
-        finalized_contigs = finalized_contigs + full_contigs[contig_name][len(full_contigs[contig_name])-missing_from_end::]
-
-        finalized_colors = missing_from_start * [finalized_colors[0] + 1] + finalized_colors
+        finalized_contigs = finalized_contigs + full_contigs[contig_name][len(full_contigs[contig_name])-missing_from_end:]
+        #finalized_colors = missing_from_start * [finalized_colors[0] + 1] + finalized_colors
+        finalized_colors = missing_from_start * [finalized_colors[0]] + finalized_colors
+        #finalized_colors = finalized_colors + missing_from_end * [finalized_colors[-1] - 1]
         finalized_colors = finalized_colors + missing_from_end * [finalized_colors[-1] - 1]
 
     reference_shift = reference_chromosome_nums[reference_name]
@@ -123,7 +126,7 @@ def main(args):
     if colored_contigs_path == "use_default":
         if not os.path.exists("./data"):
             os.makedirs("./data")
-        colored_contigs_path = "./data/colored_contigs.ccf"
+        colored_contigs_path = "./data/colored_contigs.cval"
 
     # Find the right amount of padding between chromosomes
 
