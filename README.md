@@ -10,7 +10,8 @@ This is an extension to the guided genome assembler Kermit https://github.com/ri
 5. Pre-coloring contig optical maps are mapped to the reference optical map using Valouev mapping tool https://github.com/mmuggli/valouev_optmap_alignment
 6. Cotigs are colored using contig_colorer.py
 7. Corrected reads are colored using read_colorer.py
-8. Post-coloring contigs are assembled with Kermit using the colored reads
+8. Read colors are adjusted to avoid gaps due to unused colors (optional)
+9. Post-coloring contigs are assembled with Kermit using the colored reads
 
 Alternatively you could try skipping correcting reads and polish the post-coloring reads at the end.
 
@@ -33,7 +34,7 @@ How to install (external apps)
 
 
 ## Usage
-This extension contains three main programs, optical map generator (optical_map_generator.py), contig colorer (contig_colorer.py) and read colorer (read_colorer.py).
+This extension contains four main programs, optical map generator (optical_map_generator.py), contig colorer (contig_colorer.py), read colorer (read_colorer.py) and read recolorer (read_recolorer.py).
 
 ### Optical map generator 
 ```
@@ -82,12 +83,26 @@ colored_contigs_path.cval : Path to the colored contigs file, in .cval format
 ```
 Optional arguments:
 ```
--r colored_contigs_path.cval : Path to where colored reads file is saved to, by default './data/colored_reads.cf'
+-r colored_reads_path.cf : Path to where colored reads file is saved to, by default './data/colored_reads.cf'
 -e : extends read coloring, does not do this by default
 -s : uses strict coloring i.e. coloring is done only based on the best aligning contig
 -l len_multiplier : length of the aligning section must be at least len_multiplier * read_length for the read to be colored, by default 0.0
 ```
+
+
+### Read recolorer
+```
+python3 read_recolorer.py [colored_reads_path.cf] [optional arguments] 
+```
+Required arguments:
+```
+colored_reads_path.cf : Path to the colored reads, in .cf format
+```
+Optional arguments:
+```
+-a adjusted_colored_reads_path.cf : Path to where adjusted colored reads file is saved to, by default './data/colored_reads_adjusted.cf'
+```
+
 ### Example run
-
-
+genome-assembly.sh contains an example run of the whole pipeline. Example run with explanations might appear in this readme later.
 
