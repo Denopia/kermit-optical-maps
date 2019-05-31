@@ -23,6 +23,7 @@ def parse_arguments():
 
 
 def main(args):
+    print("=== Optical map generation started ===")
     sequences_fasta_path = args.fasta_path
     optical_map_path = args.optmap_path
     enzyme = args.enzyme
@@ -35,7 +36,7 @@ def main(args):
     # Open sequences
     print("== Reading sequences ==")
     sequences = open_fasta(sequences_fasta_path)
-    print("-- Done --")
+    print("-- Done --\n")
 
     # Fragmentize sequences
     print("== Fragmentizing sequences ==")
@@ -43,7 +44,8 @@ def main(args):
     for sequence in sequences:
         seq_name = sequence.id
         seq_fragments = fragmentize_sequence(sequence.seq, enzyme)
-        sequences_fragments[seq_name] = seq_fragments
+        if len(seq_fragments) > 0:
+            sequences_fragments[seq_name] = seq_fragments
     print("-- Done --")
 
     # Write optical maps file
@@ -67,7 +69,8 @@ def main(args):
                     wfile.write("\t" + str(current_fragment / 1000))
 
             wfile.write("\n\n")
-    print("-- Done --")
+    print("-- Done --\n")
+    print("=== Optical map generation finished ===\n")
 
 
 if __name__ == "__main__":

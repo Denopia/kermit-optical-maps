@@ -22,6 +22,7 @@ def find_index(color, clist):
 
 def main(args):
 
+    print("=== Read recoloring started ===")
     print("== Initializing ==")
     coloring_path = args.read_colorings
     new_coloring_path = args.adj_colors
@@ -37,7 +38,7 @@ def main(args):
 
     colors = {}
     #oo = 0
-    print("-- Done --")
+    print("-- Done --\n")
 
     print("== Finding used colors ==")
     for cr in colorings:
@@ -55,7 +56,7 @@ def main(args):
 
     for key in colors.keys():
         colors[key].sort()
-        print("-- Done --")
+    print("-- Done --\n")
 
     print("== Writing adjusted colorings ==")
     with open(new_coloring_path, 'w') as wfile:
@@ -69,7 +70,8 @@ def main(args):
 
             wfile.write(cr[0] + "\t" + str(si + int(chromos) * multiplier) + "\t" + str(ei + int(chromos) * multiplier) + "\n")
 
-    print("-- Done --")
+    print("-- Done --\n")
+    print("=== Read recoloring finished ===\n")
 
 
 if __name__ == "__main__":

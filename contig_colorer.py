@@ -105,6 +105,7 @@ def finalize_coloring(contig_name, reference_name, new_contig, new_colors, full_
 
 
 def main(args):
+    print("=== Contig coloring started ===")
     contig_reference_mapping = args.optical_mapping_output
     reference_opt_map_full = args.ref_opt_map_path
     contig_opt_map_full = args.contig_opt_map_path
@@ -120,7 +121,7 @@ def main(args):
     # Read optical mapping output
     with open(contig_reference_mapping, "r") as rfile:
         mapping_lines = rfile.readlines()
-    print("-- Done --")
+    print("-- Done --\n")
 
     print("== Initializing ==")
     if colored_contigs_path == "use_default":
@@ -162,7 +163,7 @@ def main(args):
     reference_name = "Name:NULL"
     s_score = 0
     t_score = 0
-    print("-- Done --")
+    print("-- Done --\n")
 
     # Mapping output parsing loop
     print("== Parsing mapping output ==")
@@ -205,7 +206,7 @@ def main(args):
             reference_name = "Name:NULL"
             s_score = 0
             t_score = 0
-    print("-- Done --")
+    print("-- Done --\n")
 
     # Write colored contigs in a file
     print("== Writing contig colors in a file ==")
@@ -221,7 +222,8 @@ def main(args):
             for color in colors:
                 wfile.write(str(color) + "\t")
             wfile.write("\n\n")
-    print("-- Done --")
+    print("-- Done --\n")
+    print("=== Contig coloring finished ===\n")
 
 
 if __name__ == "__main__":
