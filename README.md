@@ -1,4 +1,4 @@
-# Optical map extension to Kermit
+# OpticalKermit: Optical map extension to Kermit
 
 This is an extension to the guided genome assembler Kermit https://github.com/rikuu/kermit. Kermit uses a reference genome or lonkage maps to color reads before assembling the genome. This extension uses optical maps to color reads, which can then be given to Kermit as input.
 
